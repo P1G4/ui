@@ -17,18 +17,19 @@ FILE *f;
 typedef enum {
     OPEN,
     CLOSE
-} window;
+} WindowState;
+
 typedef enum {
     ON,
     OFF
-} ligths;
+} LigthsState;
 
-void Scribere(window window, ligths ligths);
+void Scribere(WindowState window, LigthsState ligths);
 
 int main(void) {
 
-    window window = CLOSE;
-    ligths ligths = OFF;
+    WindowState window = CLOSE;
+    LigthsState ligths = OFF;
 
     char buffer[1024];
     if (GetCurrentDir(buffer, sizeof(buffer)) != NULL) {
@@ -53,7 +54,7 @@ int main(void) {
     return 0;
 }
 
-void Scribere(window window, ligths ligths) {
+void Scribere(WindowState window, LigthsState ligths) {
     char text[50];
 
     if (window == OPEN && ligths == ON) {
