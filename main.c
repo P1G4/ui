@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <unistd.h>
+
 #ifdef _WIN32
     #include <direct.h>   // For _getcwd() on Windows
     #define GetCurrentDir _getcwd
@@ -14,10 +14,22 @@
 
 FILE *f;
 
+typedef enum {
+    OPEN,
+    CLOSE
+} window;
+typedef enum {
+    ON,
+    OFF
+} ligths;
 
-void Scribere();
+void Scribere(window window, ligths ligths);
 
 int main(void) {
+
+    window window = CLOSE;
+    ligths ligths = OFF;
+
     char buffer[1024];
     if (GetCurrentDir(buffer, sizeof(buffer)) != NULL) {
         printf("Current working directory: %s\n", buffer);
@@ -31,11 +43,9 @@ int main(void) {
 
     printf("Full path to the file: %s/%s\n", buffer, fileName);
 
-    f = fopen(strcat(buffer, fileName), "w");
-    for (int i = 1; i <= 10; i++) {
-        Scribere();
-        sleep(1);
-    }
+    //f = fopen(strcat(buffer, fileName), "w");
+    f = fopen("C:\\Users\\burhe\\CLionProjects\\p1\\ui\\data.txt", "w");
+    Scribere(window, ligths);
 
 
     fclose(f);
@@ -43,11 +53,28 @@ int main(void) {
     return 0;
 }
 
-void Scribere() {
+void Scribere(window window, ligths ligths) {
+    char text[50];
+
+    if (window == OPEN && ligths == ON) {
+        strcpy(text, "The window is open and the lights are on.");
+
+    } else if (window == OPEN && ligths == OFF) {
+        strcpy(text, "The window is open and the lights are off.");
+
+    } else if (window == CLOSE && ligths == ON) {
+        strcpy(text, "The window is closed and the lights are on.");
+
+    } else if (window == CLOSE && ligths == OFF) {
+        strcpy(text, "The window is closed and the lights are off.");
+    }
+
+
     time_t t = time(NULL);
     char * time_str = ctime(&t);
     time_str[strlen(time_str)-1] = '\0';
 
 
-    fprintf(f, "%s\n", time_str);
+
+    fprintf(f, "%s: %s\n", time_str, text);
 }
