@@ -123,7 +123,7 @@ void sendEmail(WindowState window, LigthsState ligths) {
 
     //const char *recipients = "<burhennemalte1@gmail.com>, <Axmed141102@gmail.com>";
     const char *recipients = "<burhennemalte1@gmail.com>";
-    
+
     char powershell_command[1024];
     snprintf(powershell_command, sizeof(powershell_command),
              "powershell -Command \"Send-MailMessage -To '%s' -From '%s' -Subject 'Close window or turn off lights' "
