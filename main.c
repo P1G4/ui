@@ -14,11 +14,11 @@ typedef enum {
 typedef enum {
     ON,
     OFF
-} LigthsState;
+} lightsState;
 
 typedef struct {
     WindowState window;
-    LigthsState ligths;
+    lightsState lights;
 } States;
 
 
@@ -48,6 +48,7 @@ int main(void) {
 
 
     fclose(f1);
+
 
 
     return 0;
@@ -87,16 +88,16 @@ void sendEmail(States *states) {
 
 char *getText(States states) {
 
-    if (states.window == OPEN && states.ligths == ON) {
+    if (states.window == OPEN && states.lights == ON) {
         return "The window is open and the lights are on.";
 
-    } else if (states.window == OPEN && states.ligths == OFF) {
+    } else if (states.window == OPEN && states.lights == OFF) {
         return "The window is open and the lights are off.";
 
-    } else if (states.window == CLOSE && states.ligths == ON) {
+    } else if (states.window == CLOSE && states.lights == ON) {
         return "The window is closed and the lights are on.";
 
-    } else if (states.window == CLOSE && states.ligths == OFF) {
+    } else if (states.window == CLOSE && states.lights == OFF) {
         return "The window is closed and the lights are off.";
     }
 
@@ -106,10 +107,20 @@ char *getText(States states) {
 States *getData(States *states) {
     States state;
     int index = 0;
+
+    // Open the file
     FILE *f2 = fopen("C:\\Users\\burhe\\CLionProjects\\p1\\ui\\input.txt", "r");
-    char *window = NULL;
-    char *ligths = NULL;
-    while (fscanf(f2, "%*s %*s %s %s", window, ligths) == 1) {
+    if (f2 == NULL) {
+        perror("Error opening file");
+        return NULL;
+    }
+
+    // Allocate buffers for strings
+    char window[20], lights[20]; // Adjust buffer size if needed
+
+    // Read data from the file
+    while (fscanf(f2, "%*[^ ] %19s %19s", window, lights) == 2) { // Limit input size
+        printf("Window: %s, Lights: %s\n", window, lights);
 
         // Process window state
         if (strcmp(window, "open") == 0) {
@@ -119,24 +130,25 @@ States *getData(States *states) {
         }
 
         // Process light state
-        if (strcmp(ligths, "on") == 0) {
-            state.ligths = ON;
-        } else if (strcmp(ligths, "off") == 0) {
-            state.ligths = OFF;
+        if (strcmp(lights, "on") == 0) {
+            state.lights = ON;
+        } else if (strcmp(lights, "off") == 0) {
+            state.lights = OFF;
         }
 
-        printf("Window: %s, Ligths: %s\n", window, ligths);
-
-
         // Store the state in the array
-        states[index] = state;
-        index++;
+        if (index < MAX_STATES) { // Prevent overflow
+            states[index] = state;
+            index++;
+        } else {
+            fprintf(stderr, "Error: Exceeded maximum states array size.\n");
+            break;
+        }
     }
-
 
     fclose(f2);
 
-
     return states;
 }
+
 
