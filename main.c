@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -22,79 +21,46 @@ typedef struct {
 } States;
 
 
-FILE *f1;
-
-
 char *getText(States states);
 
-void sendEmail(States *states);
+void sendEmail(States states);
 
-void writeFile(States *states);
 
 States *getData(States *states);
 
 
 int main(void) {
-        States states[MAX_STATES] = {0}; // Initialize array
+    States states[MAX_STATES] = {0}; // Initialize array
 
-        if (getData(states) == NULL) {
-            fprintf(stderr, "Error: Unable to read data.\n");
-            return 1;
-        }
-
-        FILE *f1 = fopen("data.txt", "w");
-        if (!f1) {
-            perror("Error opening file for writing");
-            return 1;
-        }
-
-        writeFile(&states[0]);
-        sendEmail(states);
-
-        fclose(f1);
-        return 0;
-}
-
-void writeFile(States *states) {
-    char *text = getText(*states);
-
-    time_t t = time(NULL);
-    char *time_str = ctime(&t);
-    time_str[strlen(time_str) - 1] = '\0';
-
-
-    fprintf(f1, "%s: %s\n", time_str, text);
-}
-
-
-void sendEmail(States *states) {
-
-    const char *recipients = "burhennemalte1@gmail.com";
-    for (int i = 0; i < MAX_STATES; ++i) {
-        if (states[i] =/= NULL) {
-            char command[1024];
-            snprintf(command, sizeof(command),
-                     "echo \"%s\" | ssmtp -v %s", getText(*states), recipients);
-
-
-            printf("Executing: %s\n", command);
-
-            int result = system(command);
-
-            if (result == 0) {
-                printf("Command executed successfully.\n");
-            } else {
-                printf("Command execution failed with code: %d\n", result);
-            }
-        }
-        else {
-            printf("faild");
-            break;
-        }
-
+    if (getData(states) == NULL) {
+        fprintf(stderr, "Error: Unable to read data.\n");
+        return 1;
     }
 
+    sendEmail(states[0]);
+
+    return 0;
 }
+
+void sendEmail(States states) {
+    char command[1024];
+    const char *recipients = "burhennemalte1@gmail.com";
+
+    snprintf(command, sizeof(command),
+             "echo \"%s\" | ssmtp -v %s", getText(states), recipients);
+
+
+    printf("Executing: %s\n", command);
+
+    int result = system(command);
+
+    if (result == 0) {
+        printf("Command executed successfully.\n");
+    } else {
+        printf("Command execution failed with code: %d\n", result);
+    }
+}
+
 
 char *getText(States states) {
 
