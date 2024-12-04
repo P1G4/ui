@@ -70,21 +70,30 @@ void writeFile(States *states) {
 void sendEmail(States *states) {
 
     const char *recipients = "burhennemalte1@gmail.com";
+    for (int i = 0; i < MAX_STATES; ++i) {
+        if (states[i] =/= NULL) {
+            char command[1024];
+            snprintf(command, sizeof(command),
+                     "echo \"%s\" | ssmtp -v %s", getText(*states), recipients);
 
-    char command[1024];
-    snprintf(command, sizeof(command),
-             "echo \"%s\" | ssmtp -v %s", getText(*states), recipients);
 
+            printf("Executing: %s\n", command);
 
-    printf("Executing: %s\n", command);
+            int result = system(command);
 
-    int result = system(command);
+            if (result == 0) {
+                printf("Command executed successfully.\n");
+            } else {
+                printf("Command execution failed with code: %d\n", result);
+            }
+        }
+        else {
+            printf("faild");
+            break;
+        }
 
-    if (result == 0) {
-        printf("Command executed successfully.\n");
-    } else {
-        printf("Command execution failed with code: %d\n", result);
     }
+
 }
 
 char *getText(States states) {
