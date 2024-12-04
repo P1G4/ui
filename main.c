@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_STATES 100
+#define MAX_STATES 50
 
 
 typedef enum {
@@ -35,23 +35,24 @@ States *getData(States *states);
 
 
 int main(void) {
+        States states[MAX_STATES] = {0}; // Initialize array
 
-    States states[MAX_STATES];
+        if (getData(states) == NULL) {
+            fprintf(stderr, "Error: Unable to read data.\n");
+            return 1;
+        }
 
-    getData(states);
+        FILE *f1 = fopen("data.txt", "w");
+        if (!f1) {
+            perror("Error opening file for writing");
+            return 1;
+        }
 
+        writeFile(&states[0]);
+        sendEmail(states);
 
-    f1 = fopen("data.txt", "w");
-
-    writeFile(&states[0]);
-    sendEmail(states);
-
-
-    fclose(f1);
-
-
-
-    return 0;
+        fclose(f1);
+        return 0;
 }
 
 void writeFile(States *states) {
@@ -109,7 +110,7 @@ States *getData(States *states) {
     int index = 0;
 
     // Open the file
-    FILE *f2 = fopen("C:\\Users\\burhe\\CLionProjects\\p1\\ui\\input.txt", "r");
+    FILE *f2 = fopen("input.txt", "r");
     if (f2 == NULL) {
         perror("Error opening file");
         return NULL;
