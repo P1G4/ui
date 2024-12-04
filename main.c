@@ -2,10 +2,8 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
 
-
-#define GetCurrentDir getcwd
+#define MAX_STATES 100
 
 
 typedef enum {
@@ -18,56 +16,62 @@ typedef enum {
     OFF
 } LigthsState;
 
+typedef struct {
+    WindowState window;
+    LigthsState ligths;
+} States;
 
-FILE *f;
 
-char* getText(WindowState window, LigthsState lights);
-void sendEmail(WindowState window, LigthsState ligths);
-void writeFile(WindowState window, LigthsState ligths);
+FILE *f1;
 
+
+char *getText(States states);
+
+void sendEmail(States *states);
+
+void writeFile(States *states);
+
+States *getData(States *states);
 
 
 int main(void) {
 
-    WindowState window = CLOSE;
-    LigthsState ligths = OFF;
+    States states[MAX_STATES];
 
-    
-
-    f = fopen("data.txt", "w");
-    writeFile(window, ligths);
-    sendEmail(window, ligths);
+    getData(states);
 
 
-    fclose(f);
+    f1 = fopen("data.txt", "w");
+
+    writeFile(&states[0]);
+    sendEmail(states);
+
+
+    fclose(f1);
+
 
     return 0;
 }
 
-void writeFile(WindowState window, LigthsState ligths) {
-    char* text = getText(window, ligths);
+void writeFile(States *states) {
+    char *text = getText(*states);
 
     time_t t = time(NULL);
-    char * time_str = ctime(&t);
-    time_str[strlen(time_str)-1] = '\0';
+    char *time_str = ctime(&t);
+    time_str[strlen(time_str) - 1] = '\0';
 
 
-
-    fprintf(f, "%s: %s\n", time_str, text);
+    fprintf(f1, "%s: %s\n", time_str, text);
 }
 
 
+void sendEmail(States *states) {
 
-
-
-void sendEmail(WindowState window, LigthsState ligths) {
-
-    //const char *recipients = "burhennemalte1@gmail.com Axmed141102@gmail.com";
     const char *recipients = "burhennemalte1@gmail.com";
 
     char command[1024];
     snprintf(command, sizeof(command),
-             "echo \"%s\" | ssmtp -v %s", getText(window, ligths), recipients);
+             "echo \"%s\" | ssmtp -v %s", getText(*states), recipients);
 
 
     printf("Executing: %s\n", command);
@@ -81,19 +85,58 @@ void sendEmail(WindowState window, LigthsState ligths) {
     }
 }
 
-char* getText(WindowState window, LigthsState lights) {
-    if (window == OPEN && lights == ON) {
+char *getText(States states) {
+
+    if (states.window == OPEN && states.ligths == ON) {
         return "The window is open and the lights are on.";
 
-    } else if (window == OPEN && lights == OFF) {
+    } else if (states.window == OPEN && states.ligths == OFF) {
         return "The window is open and the lights are off.";
 
-    } else if (window == CLOSE && lights == ON) {
+    } else if (states.window == CLOSE && states.ligths == ON) {
         return "The window is closed and the lights are on.";
 
-    } else if (window == CLOSE && lights == OFF) {
+    } else if (states.window == CLOSE && states.ligths == OFF) {
         return "The window is closed and the lights are off.";
     }
 
     return "Unknown state.";
 }
+
+States *getData(States *states) {
+    States state;
+    int index = 0;
+    FILE *f2 = fopen("C:\\Users\\burhe\\CLionProjects\\p1\\ui\\input.txt", "r");
+    char *window = NULL;
+    char *ligths = NULL;
+    while (fscanf(f2, "%*s %*s %s %s", window, ligths) == 1) {
+
+        // Process window state
+        if (strcmp(window, "open") == 0) {
+            state.window = OPEN;
+        } else if (strcmp(window, "closed") == 0) {
+            state.window = CLOSE;
+        }
+
+        // Process light state
+        if (strcmp(ligths, "on") == 0) {
+            state.ligths = ON;
+        } else if (strcmp(ligths, "off") == 0) {
+            state.ligths = OFF;
+        }
+
+        printf("Window: %s, Ligths: %s\n", window, ligths);
+
+
+        // Store the state in the array
+        states[index] = state;
+        index++;
+    }
+
+
+    fclose(f2);
+
+
+    return states;
+}
+
