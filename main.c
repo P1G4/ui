@@ -25,7 +25,6 @@ char *getText(States states);
 
 void sendEmail(States states);
 
-
 States *getData(States *states);
 
 
@@ -44,7 +43,7 @@ int main(void) {
 
 void sendEmail(States states) {
     char command[1024];
-    const char *recipients = "burhennemalte1@gmail.com";
+    const char *recipients = "maltetestemail@gmail.com";
 
     snprintf(command, sizeof(command),
              "echo \"%s\" | ssmtp -v %s", getText(states), recipients);
@@ -84,36 +83,30 @@ States *getData(States *states) {
     States state;
     int index = 0;
 
-    // Open the file
     FILE *f2 = fopen("input.txt", "r");
     if (f2 == NULL) {
         perror("Error opening file");
         return NULL;
     }
 
-    // Allocate buffers for strings
-    char window[20], lights[20]; // Adjust buffer size if needed
+    char window[20], lights[20];
 
-    // Read data from the file
-    while (fscanf(f2, "%*[^ ] %19s %19s", window, lights) == 2) { // Limit input size
+    while (fscanf(f2, "%*[^ ] %19s %19s", window, lights) == 2) {
         printf("Window: %s, Lights: %s\n", window, lights);
 
-        // Process window state
         if (strcmp(window, "open") == 0) {
             state.window = OPEN;
         } else if (strcmp(window, "closed") == 0) {
             state.window = CLOSE;
         }
 
-        // Process light state
         if (strcmp(lights, "on") == 0) {
             state.lights = ON;
         } else if (strcmp(lights, "off") == 0) {
             state.lights = OFF;
         }
 
-        // Store the state in the array
-        if (index < MAX_STATES) { // Prevent overflow
+        if (index < MAX_STATES) {
             states[index] = state;
             index++;
         } else {
