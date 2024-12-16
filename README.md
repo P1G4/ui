@@ -2,4 +2,4 @@
 c koden
 
 
-primært skrivet af Ahmed, Malte
+primært skrivet af Mohammed og Malte
